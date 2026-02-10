@@ -1,4 +1,4 @@
-# hSenid Mobile Cloud Assignment Store
+# AWS Assignment WebStore
 
 A containerized Node.js e-commerce application designed for the **AWS Infrastructure Deployment Assignment**. This application integrates with Amazon RDS, S3, and EFS -- your task is to provision the AWS infrastructure and deploy it.
 
@@ -15,7 +15,7 @@ A containerized Node.js e-commerce application designed for the **AWS Infrastruc
 |-----------|-----------|
 | Runtime | Node.js 20 (Alpine) |
 | Framework | Express.js 4.x + EJS Templates |
-| Database | PostgreSQL via Sequelize ORM |
+| Database | PostgreSQL or MySQL via Sequelize ORM |
 | Storage | AWS S3 (product images + static assets) |
 | Logging | Winston with daily rotation to EFS |
 | Container | Docker (multi-stage build) |
@@ -26,7 +26,7 @@ A containerized Node.js e-commerce application designed for the **AWS Infrastruc
 |---------|------------------------|
 | **ECR** | Stores the Docker image you build and push |
 | **EC2** | Runs the Docker container |
-| **RDS (PostgreSQL)** | Stores users, products, and cart data |
+| **RDS** | Stores users, products, and cart data (supports PostgreSQL or MySQL) |
 | **S3** | Stores product images (uploaded by admin) and static assets (CSS, JS, SVGs) |
 | **EFS** | Stores application log files (`app-YYYY-MM-DD.log`, `error-YYYY-MM-DD.log`) |
 
@@ -92,9 +92,6 @@ See **[DEPLOYMENT.md](DEPLOYMENT.md)** for:
 - Detailed explanation of how the application works
 - How each AWS service (RDS, S3, EFS) is integrated
 - Step-by-step deployment instructions
-- EC2 IAM role policy
-- S3 bucket policy
-- EFS mount instructions
 - Troubleshooting guide
 - Verification checklist
 

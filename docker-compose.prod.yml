@@ -1,5 +1,5 @@
 # =============================================================================
-# hSenid Mobile Cloud Assignment Store - Production Docker Compose
+# AWS Assignment WebStore - Production Docker Compose
 # =============================================================================
 # This file is used to deploy the application on an EC2 instance.
 #
@@ -59,6 +59,8 @@ services:
       # -- Database (RDS) Configuration --
       # << CHANGE THIS >> Set DB_HOST to your RDS endpoint
       # Find it in: AWS Console > RDS > Databases > your-db > Endpoint
+      # Supported: postgres (PostgreSQL) or mysql (MySQL)
+      # If using MySQL, change DB_DIALECT to mysql and DB_PORT to 3306
       - DB_DIALECT=postgres
       - DB_HOST=<< CHANGE THIS - Your RDS endpoint e.g. mydb.abcdefg.us-east-2.rds.amazonaws.com >>
       - DB_PORT=5432
