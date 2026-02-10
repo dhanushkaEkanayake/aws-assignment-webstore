@@ -1,0 +1,69 @@
+# =============================================================================
+# hSenid Mobile Cloud Assignment Store - Docker Compose (Local Development)
+# =============================================================================
+# Usage:
+#   docker-compose up --build      # Start all services
+#   docker-compose down            # Stop all services
+#   docker-compose down -v         # Stop and remove volumes
+# =============================================================================
+
+services:
+  # ---- Application ----
+  app:
+    build: .
+    container_name: hsenid-cloudmart-app
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - APP_NAME=hSenid Mobile Cloud Assignment Store
+      - DB_DIALECT=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=cloudmart
+      - DB_USER=dbuser
+      - DB_PASSWORD=dbpassword
+      - SESSION_SECRET=dev-session-secret-do-not-use-in-production
+      - AWS_REGION=us-east-2
+      - AWS_S3_BUCKET=aws-assignment-rsp
+      # EFS_LOGS_PATH not set → falls back to /app/logs inside container
+      - ENABLE_FILE_LOGS=true
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - cloudmart-network
+
+  # ---- PostgreSQL Database (simulates AWS RDS) ----
+  db:
+    image: postgres:16-alpine
+    container_name: hsenid-cloudmart-db
+    environment:
+      - POSTGRES_DB=cloudmart
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=dbpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser -d cloudmart"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - cloudmart-network
+
+volumes:
+  db_data:
+    name: hsenid-cloudmart-db-data
+
+networks:
+  cloudmart-network:
+    name: hsenid-cloudmart-network
+    driver: bridge

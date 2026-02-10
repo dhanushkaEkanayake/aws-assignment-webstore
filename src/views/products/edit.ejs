@@ -1,0 +1,87 @@
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="d-flex align-items-center mb-4">
+      <a href="/admin/products" class="btn btn-outline-secondary me-3">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      <h2 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit Product</h2>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <form action="/admin/products/<%= product.id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="name" name="name"
+                   value="<%= product.name %>" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description"
+                      rows="4"><%= product.description || '' %></textarea>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="price" class="form-label">Price ($) <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" class="form-control" id="price" name="price"
+                       step="0.01" min="0" value="<%= product.price %>" required>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="category" class="form-label">Category</label>
+              <select class="form-select" id="category" name="category">
+                <option value="">Select a category</option>
+                <option value="Electronics" <%= product.category === 'Electronics' ? 'selected' : '' %>>Electronics</option>
+                <option value="Clothing" <%= product.category === 'Clothing' ? 'selected' : '' %>>Clothing</option>
+                <option value="Books" <%= product.category === 'Books' ? 'selected' : '' %>>Books</option>
+                <option value="Home & Garden" <%= product.category === 'Home & Garden' ? 'selected' : '' %>>Home & Garden</option>
+              </select>
+            </div>
+          </div>
+
+          <% if (product.image_url) { %>
+            <div class="mb-3">
+              <label class="form-label">Current Image</label>
+              <div>
+                <img src="<%= product.image_url %>"
+                     alt="<%= product.name %>"
+                     class="rounded border"
+                     style="max-height: 150px;"
+                     onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27150%27 height=%27150%27 viewBox=%270 0 150 150%27%3E%3Crect width=%27150%27 height=%27150%27 fill=%27%23dee2e6%27/%3E%3Ctext x=%2775%27 y=%2780%27 text-anchor=%27middle%27 fill=%27%236c757d%27 font-family=%27Arial%27 font-size=%2714%27%3ENo Image%3C/text%3E%3C/svg%3E'">
+                <% if (product.s3_key) { %>
+                  <span class="badge bg-success ms-2"><i class="bi bi-check"></i> Stored in S3</span>
+                <% } %>
+              </div>
+            </div>
+          <% } %>
+
+          <div class="mb-4">
+            <label for="image" class="form-label">
+              <%= product.image_url ? 'Replace Image' : 'Product Image' %>
+            </label>
+            <input type="file" class="form-control" id="image" name="image"
+                   accept="image/jpeg,image/png,image/gif,image/webp">
+            <div class="form-text">
+              <i class="bi bi-cloud-arrow-up me-1"></i>
+              Leave empty to keep the current image. Max size: 5MB.
+            </div>
+            <div id="imagePreview" class="mt-2" style="display: none;">
+              <img id="previewImg" src="" alt="Preview" class="rounded" style="max-height: 200px;">
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1"></i>Update Product
+            </button>
+            <a href="/admin/products" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

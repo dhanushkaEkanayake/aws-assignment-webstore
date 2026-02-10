@@ -1,0 +1,63 @@
+<div class="row">
+  <div class="col-md-6 mb-4">
+    <div class="card border-0 shadow-sm">
+      <img src="<%= product.image_url || 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27600%27 height=%27400%27 viewBox=%270 0 600 400%27%3E%3Crect width=%27600%27 height=%27400%27 fill=%27%230066cc%27/%3E%3Ctext x=%27300%27 y=%27210%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27Arial%27 font-size=%2724%27%3ENo Image%3C/text%3E%3C/svg%3E' %>"
+           class="card-img-top"
+           alt="<%= product.name %>"
+           style="max-height: 400px; object-fit: cover;"
+           onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27600%27 height=%27400%27 viewBox=%270 0 600 400%27%3E%3Crect width=%27600%27 height=%27400%27 fill=%27%230066cc%27/%3E%3Ctext x=%27300%27 y=%27210%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27Arial%27 font-size=%2724%27%3ENo Image%3C/text%3E%3C/svg%3E'">
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/products">Products</a></li>
+        <% if (product.category) { %>
+          <li class="breadcrumb-item">
+            <a href="/products?category=<%= encodeURIComponent(product.category) %>"><%= product.category %></a>
+          </li>
+        <% } %>
+        <li class="breadcrumb-item active"><%= product.name %></li>
+      </ol>
+    </nav>
+
+    <h2 class="fw-bold"><%= product.name %></h2>
+
+    <% if (product.category) { %>
+      <span class="badge bg-primary mb-3"><%= product.category %></span>
+    <% } %>
+
+    <h3 class="text-primary my-3">$<%= parseFloat(product.price).toFixed(2) %></h3>
+
+    <div class="card border-0 bg-light mb-4">
+      <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted">Description</h6>
+        <p class="card-text"><%= product.description || 'No description available for this product.' %></p>
+      </div>
+    </div>
+
+    <% if (currentUser) { %>
+      <form action="/cart/add" method="POST" class="d-flex align-items-center gap-3">
+        <div class="input-group" style="max-width: 150px;">
+          <span class="input-group-text">Qty</span>
+          <input type="number" class="form-control" name="quantity" value="1" min="1" max="99">
+        </div>
+        <input type="hidden" name="productId" value="<%= product.id %>">
+        <button type="submit" class="btn btn-primary btn-lg">
+          <i class="bi bi-cart-plus me-1"></i>Add to Cart
+        </button>
+      </form>
+    <% } else { %>
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle me-1"></i>
+        <a href="/login">Login</a> or <a href="/register">register</a> to add items to your cart.
+      </div>
+    <% } %>
+
+    <hr class="my-4">
+    <a href="/products" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Back to Products
+    </a>
+  </div>
+</div>

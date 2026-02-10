@@ -1,0 +1,93 @@
+# =============================================================================
+# hSenid Mobile Cloud Assignment Store - Production Docker Compose
+# =============================================================================
+# This file is used to deploy the application on an EC2 instance.
+#
+# INSTRUCTIONS:
+#   1. Copy this file to your EC2 instance
+#   2. Replace ALL values marked with << CHANGE THIS >> with your actual values
+#   3. Run: docker-compose -f docker-compose.prod.yml up -d
+#
+# PREREQUISITES:
+#   - Docker and Docker Compose installed on EC2
+#   - ECR repository created and image pushed
+#   - RDS instance created and accessible from EC2
+#   - S3 bucket created with public read policy on /static/* and /products/*
+#   - EFS file system mounted on EC2 at /logs (or your chosen mount point)
+#   - EC2 IAM role with S3 and ECR permissions attached
+# =============================================================================
+
+services:
+  hsenid-cloudmart:
+    # -------------------------------------------------------------------------
+    # Container Image
+    # -------------------------------------------------------------------------
+    # << CHANGE THIS >> Replace with your ECR repository URI and image tag
+    # Format: <account-id>.dkr.ecr.<region>.amazonaws.com/<repo-name>:<tag>
+    # Example: 123456789012.dkr.ecr.us-east-2.amazonaws.com/aws-assignment:1.0
+    image: << CHANGE THIS >>.dkr.ecr.us-east-2.amazonaws.com/aws-assignment:latest
+
+    container_name: hsenid-cloudmart
+    restart: unless-stopped
+
+    # -------------------------------------------------------------------------
+    # Volume Mounts
+    # -------------------------------------------------------------------------
+    # Maps the EFS mount point on EC2 to the container's log directory.
+    # The app writes daily-rotated log files here (app-YYYY-MM-DD.log, error-YYYY-MM-DD.log).
+    # Make sure EFS is mounted on the host at /logs before starting.
+    #   On EC2: sudo mkdir -p /logs && sudo chmod 777 /logs
+    volumes:
+      - /logs:/app/logs
+
+    # -------------------------------------------------------------------------
+    # Port Mapping
+    # -------------------------------------------------------------------------
+    # Maps host port to container port. Both should match the PORT env var below.
+    # If using an ALB, the ALB target group should point to this port.
+    ports:
+      - "8089:8089"
+
+    # -------------------------------------------------------------------------
+    # Environment Variables
+    # -------------------------------------------------------------------------
+    environment:
+      # -- App Settings (no changes needed) --
+      - NODE_ENV=production
+      - PORT=8089
+
+      # -- Database (RDS) Configuration --
+      # << CHANGE THIS >> Set DB_HOST to your RDS endpoint
+      # Find it in: AWS Console > RDS > Databases > your-db > Endpoint
+      - DB_DIALECT=postgres
+      - DB_HOST=<< CHANGE THIS - Your RDS endpoint e.g. mydb.abcdefg.us-east-2.rds.amazonaws.com >>
+      - DB_PORT=5432
+      - DB_NAME=cloudmart
+      - DB_USER=<< CHANGE THIS - Your RDS master username >>
+      - DB_PASSWORD=<< CHANGE THIS - Your RDS master password >>
+
+      # -- Session Secret --
+      # << CHANGE THIS >> Use any random string. This encrypts user session cookies.
+      # Generate one with: openssl rand -base64 32
+      - SESSION_SECRET=<< CHANGE THIS - Any random string >>
+
+      # -- AWS S3 Configuration --
+      # << CHANGE THIS >> Set to your S3 bucket name and region
+      - AWS_REGION=<< CHANGE THIS - e.g. us-east-2 >>
+      - AWS_S3_BUCKET=<< CHANGE THIS - Your S3 bucket name >>
+
+      # -- Static Assets from S3 --
+      # << CHANGE THIS >> URL where static assets (CSS/JS) are served from S3
+      # Format: https://<bucket-name>.s3.<region>.amazonaws.com/static
+      - STATIC_S3_URL=https://<< CHANGE THIS - bucket-name >>.s3.<< CHANGE THIS - region >>.amazonaws.com/static
+
+    # -------------------------------------------------------------------------
+    # Logging Configuration (Docker level)
+    # -------------------------------------------------------------------------
+    # Limits Docker's own JSON log files to prevent disk space issues.
+    # This is separate from application logs written to EFS.
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
